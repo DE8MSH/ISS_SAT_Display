@@ -10,4 +10,4 @@ Put URL into this part of the code in INO file:
 
 { Sgp4(), "**https://celestrak.org/NORAD/elements/gp.php?CATNR=27607&FORMAT=tle**", TFT_YELLOW }, // SO50
 
-**Friendly note: You get no warranty, no support, no anythng for this project. It's a proove of concept. Me and ChatGPT are happy that satellites can be displayed on a cheap chinese ESP32-2432S028.**
+**Friendly note: You get no warranty, no support, no anything for this project. It's a proove of concept. Me and ChatGPT are happy that satellites can be displayed on a cheap chinese ESP32-2432S028.**
