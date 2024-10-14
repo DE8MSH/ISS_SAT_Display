@@ -185,11 +185,11 @@ void Second_Tick() {
     satellites[i].satAz = satellites[i].sat.satAz;  // Azimut speichern
     satellites[i].satEl = satellites[i].sat.satEl;  // Elevation speichern
 
-    if (satellites[i].satEl >= minel) {
-      // Append the satellite name to the buffer
-      strncat(namesWithElevation, satellites[i].name, sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);
-      //strncat(namesWithElevation, " ", sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);  // Add comma and space
-    }
+   // if (satellites[i].satEl >= minel) {
+   //   // Append the satellite name to the buffer
+   //   strncat(namesWithElevation, satellites[i].name, sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);
+   //   //strncat(namesWithElevation, " ", sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);  // Add comma and space
+   // }
 
     Serial.println("Satellit " + String(i) + ": Azimut = " + String(satellites[i].satAz) + " Elevation = " + String(satellites[i].satEl));
   }
@@ -205,14 +205,16 @@ void Second_Tick() {
   }
 }
 // Function to display satellite names on the screen
-void displaySatelliteNames() {
-  // Set position for names
-  tft.setCursor(0, 0);  // Cursor position
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Set text color
-  tft.setTextSize(1);  // Set text size
-  //tft.println("Satellites with Elevation >= 1°:");
-  tft.println(namesWithElevation);  // Print names
-}
+//void displaySatelliteNames() {
+//  // Set position for names
+//  tft.setCursor(0, 0);  // Cursor position
+//  tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Set text color
+//  tft.setTextSize(1);  // Set text size
+//  //tft.println("Satellites with Elevation >= 1°:");
+//  tft.println(namesWithElevation);  // Print names
+//}
+
+
 // Setup-Funktion, die einmal beim Start aufgerufen wird
 void setup() {
   tft.begin();  // TFT initialisieren
