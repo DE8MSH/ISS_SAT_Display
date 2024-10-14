@@ -2,6 +2,8 @@ ISS / SAT Display
 
 With a little help of ChatGPT. Why? Why not! ;)
 
+Made on Arduino 2.1.1. You have to add several libraries to Arduino environment.
+
 Get TLE data from https://celestrak.org/. BTW donate them. They're doing a great job since decades!!!
 
 Goto 'Current Data (GP)'. Then choose category. Amateur for e.g. Choose Table list. In Latest Data (right side of page) you find the right URL. 
