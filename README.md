@@ -1,8 +1,10 @@
 ISS / SAT Display
 
+For ESP32-2432S028 platform.
+
 With a little help of ChatGPT. Why? Why not! ;)
 
-Made on Arduino 2.1.1. You have to add several libraries to Arduino environment.
+Made on Arduino 2.3.2. You have to add several libraries to Arduino environment.
 
 Get TLE data from https://celestrak.org/. BTW donate them. They're doing a great job for decades!!!
 
