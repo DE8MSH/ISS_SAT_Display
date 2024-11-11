@@ -6,6 +6,8 @@ With a little help of ChatGPT. Why? Why not! ;)
 
 ![screenshot](1728894498291.jpg)
 
+![screenshot](GcGTIsbWYAAevg8.jpeg)
+
 Made on Arduino 2.3.2. You have to add several libraries to Arduino environment:
 
 #include <Sgp4.h>
