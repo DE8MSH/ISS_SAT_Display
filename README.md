@@ -4,7 +4,8 @@ For ESP32-2432S028 platform.
 
 With a little help of ChatGPT. Why? Why not! ;)
 
-![alt text]([https://raw.githubusercontent.com/DE8MSH/ISS_SAT_Display/refs/heads/main/1728894498291.jpg])
+
+https://raw.githubusercontent.com/DE8MSH/ISS_SAT_Display/refs/heads/main/1728894498291.jpg
 
 Made on Arduino 2.3.2. You have to add several libraries to Arduino environment:
 
