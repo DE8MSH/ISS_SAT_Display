@@ -125,8 +125,6 @@ void removeConsecutiveSpaces(char* name) {
   }
 }
 
-// Funktion zum Zeichnen der Satelliten auf dem Bildschirm
-// Funktion zum Zeichnen der Satelliten auf dem Bildschirm mit zukünftiger Position
 // Funktion zum Zeichnen der Satelliten auf dem Bildschirm mit zukünftiger Position
 void drawSatellites() {
   tft.fillScreen(TFT_BLACK);  // Bildschirm schwarz füllen
@@ -274,7 +272,7 @@ void setup() {
   tft.println("Zeit-Client aktualisiert ok.");
   unixtime = timeClient.getEpochTime();  // Aktuelle Zeit abrufen
 
-  satellites[0].sat.site(53.04543841406317, 8.893867310691851, 9);  // Standort für den Satelliten setzen
+  satellites[0].sat.site(53.0454842317606, 8.890898449203494, 9);  // Standort für den Satelliten setzen
 
   tft.println("TLE abrufen...");  // TLE-Daten abrufen
   fetchTLE();  // TLE-Daten abrufen
