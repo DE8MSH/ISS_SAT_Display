@@ -4,7 +4,16 @@ For ESP32-2432S028 platform.
 
 With a little help of ChatGPT. Why? Why not! ;)
 
-Made on Arduino 2.3.2. You have to add several libraries to Arduino environment.
+Made on Arduino 2.3.2. You have to add several libraries to Arduino environment:
+
+#include <Sgp4.h>
+#include <Ticker.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
+#include <TFT_eSPI.h>
+#include <PNGdec.h>
 
 Get TLE data from https://celestrak.org/. BTW donate them. They're doing a great job for decades!!!
 
