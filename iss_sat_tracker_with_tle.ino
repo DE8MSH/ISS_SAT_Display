@@ -45,15 +45,15 @@ TFT_eSPI tft = TFT_eSPI();  // TFT-Objekt für die Anzeige
 
 Satellite satellites[] = {
 
-  //{ Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=2005-018&FORMAT=tle", TFT_BLUE },
-  //{ Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=1998-030&FORMAT=tle", TFT_BLUE },
-  //{ Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=2009-005&FORMAT=tle", TFT_BLUE },
+  { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=2005-018&FORMAT=tle", TFT_BLUE },
+  { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=1998-030&FORMAT=tle", TFT_BLUE },
+  { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?INTDES=2009-005&FORMAT=tle", TFT_BLUE },
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=27607&FORMAT=tle", TFT_YELLOW }, // SO50
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=7530&FORMAT=tle", TFT_YELLOW }, // OSCAR 7
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=43017&FORMAT=tle", TFT_YELLOW }, // FOX1B
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=23439&FORMAT=tle", TFT_YELLOW }, // RS15
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=22825&FORMAT=tle", TFT_YELLOW }, // EYESAT APRS
-  //{ Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=40069&FORMAT=tle", TFT_BLUE },
+  { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=40069&FORMAT=tle", TFT_BLUE },
   { Sgp4(), "https://celestrak.org/NORAD/elements/gp.php?CATNR=48274&FORMAT=tle", TFT_RED }, // China Raumstation
   { Sgp4(), "https://live.ariss.org/iss.txt", TFT_RED }, // ISS
   
@@ -62,6 +62,9 @@ Satellite satellites[] = {
 const int numSatellites = sizeof(satellites) / sizeof(satellites[0]);  // Anzahl der Satelliten
 
 char namesWithElevation[300]; // Adjust size as needed
+
+//####
+
 
 // Funktion zum Abrufen der TLE-Daten (Two-Line Element) für die Satelliten
 void fetchTLE() {
@@ -123,6 +126,8 @@ void removeConsecutiveSpaces(char* name) {
 }
 
 // Funktion zum Zeichnen der Satelliten auf dem Bildschirm
+// Funktion zum Zeichnen der Satelliten auf dem Bildschirm mit zukünftiger Position
+// Funktion zum Zeichnen der Satelliten auf dem Bildschirm mit zukünftiger Position
 void drawSatellites() {
   tft.fillScreen(TFT_BLACK);  // Bildschirm schwarz füllen
   int16_t rc = png.openFLASH((uint8_t*)karte, sizeof(karte), pngDraw);  // PNG-Bild laden
@@ -132,38 +137,61 @@ void drawSatellites() {
     tft.endWrite();
     png.close();  // PNG schließen
   }
-
   for (int i = 0; i < numSatellites; i++) {
-    int x_sat = map(satellites[i].satLon, -180, 180, 0, 320);  // X-Position berechnen
-    int y_sat = map(satellites[i].satLat, 90, -90, 0, 240);  // Y-Position berechnen
+
+    // Aktuelle Position des Satelliten berechnen
+    int x_sat_now = map(satellites[i].satLon, -180, 180, 0, 320);
+    int y_sat_now = map(satellites[i].satLat, 90, -90, 0, 240);
+
+    // Schleife zur Berechnung der Punkte alle 10 Sekunden für die nächsten 10 Minuten
+    //for (int t = 120; t <= 3600; t += 120) { // Schritte alle 10 Sekunden
+    for (int t = 120; t <= 1200*2; t += 30) { // Schritte alle 10 Sekunden    
+      satellites[i].sat.findsat(unixtime + t);  // Position zu diesem Zeitpunkt berechnen
+      double futureLon = satellites[i].sat.satLon;
+      double futureLat = satellites[i].sat.satLat;
+      int x_sat_future = map(futureLon, -180, 180, 0, 320);
+      int y_sat_future = map(futureLat, 90, -90, 0, 240);
+
+      // Zeichne einen Punkt an der berechneten Position
+      tft.drawPixel(x_sat_future-1, y_sat_future, TFT_WHITE);
+      tft.drawPixel(x_sat_future+1, y_sat_future, TFT_GREY);
+      tft.drawPixel(x_sat_future, y_sat_future, TFT_BLACK);
+      
+
+      //tft.fillCircle(x_sat_future, y_sat_future, 1, satellites[i].color);
+      //tft.drawCircle(x_sat_future, y_sat_future, 2, TFT_BLACK);
+    }
+
+    // Zurücksetzen auf aktuelle Zeit für weitere Berechnungen
+    satellites[i].sat.findsat(unixtime);
+
+    // Satellitenposition als Kreis zeichnen
+    tft.fillCircle(x_sat_now, y_sat_now, 5, satellites[i].color);
+    tft.drawCircle(x_sat_now, y_sat_now, 6, TFT_BLACK);
+
+    // Satellitennamen anzeigen
     char nameWithoutSpaces[30];
-    strncpy(nameWithoutSpaces, satellites[i].name, sizeof(nameWithoutSpaces) - 1);  // Satellitennamen kopieren
-    removeConsecutiveSpaces(nameWithoutSpaces);  // Leerzeichen entfernen
-    tft.setCursor(x_sat - (strlen(nameWithoutSpaces) * 3), y_sat + 9);  // Cursorposition setzen
-    tft.setTextColor(satellites[i].color, TFT_BLACK);  // Textfarbe setzen
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Textfarbe setzen
-    tft.setTextSize(1);  // Schriftgröße setzen
-    tft.print(nameWithoutSpaces);  // Satellitennamen drucken
-    //tft.fillCircle(x_sat, y_sat, 5, satellites[i].color);  // Satellitenposition zeichnen
-    //tft.drawCircle(x_sat, y_sat, 24, TFT_WHITE);  // Außenkreis zur Hervorhebung zeichnen
+    strncpy(nameWithoutSpaces, satellites[i].name, sizeof(nameWithoutSpaces) - 1);
+    removeConsecutiveSpaces(nameWithoutSpaces);
+    tft.setCursor(x_sat_now - (strlen(nameWithoutSpaces) * 3), y_sat_now + 9);
+    tft.setTextColor(satellites[i].color, TFT_BLACK);
+    tft.setTextSize(1);
+    tft.print(nameWithoutSpaces);
   }
+
 
   for (int i = 0; i < numSatellites; i++) {
-    int x_sat = map(satellites[i].satLon, -180, 180, 0, 320);  // X-Position berechnen
-    int y_sat = map(satellites[i].satLat, 90, -90, 0, 240);  // Y-Position berechnen
 
-    tft.fillCircle(x_sat, y_sat, 5, satellites[i].color);  // Satellitenposition zeichnen
-    tft.drawCircle(x_sat, y_sat, 6, TFT_BLUE);  // Außenkreis zur Hervorhebung zeichnen
-    //tft.drawCircle(x_sat, y_sat, 24, TFT_WHITE);  // Außenkreis zur Hervorhebung zeichnen
   }
-
-
-  int siteX = map(8.893867310691851, -180, 180, 0, 320);  // X-Position des Standorts berechnen
-  int siteY = map(53.04543841406317, 90, -90, 0, 240);  // Y-Position des Standorts berechnen
-  tft.fillCircle(siteX, siteY, 5, TFT_GREEN);  // Standort zeichnen
-  tft.drawCircle(siteX, siteY, 6, TFT_BLACK);  // Außenkreis zur Hervorhebung zeichnen
-  tft.drawCircle(siteX, siteY, 7, TFT_BLACK);  // Außenkreis zur Hervorhebung zeichnen
+  // Standort zeichnen
+  int siteX = map(8.893867310691851, -180, 180, 0, 320);
+  int siteY = map(53.04543841406317, 90, -90, 0, 240);
+  tft.fillCircle(siteX, siteY, 5, TFT_GREEN);
+  tft.drawCircle(siteX, siteY, 6, TFT_BLACK);
+  tft.drawCircle(siteX, siteY, 7, TFT_BLACK);
 }
+
+
 
 // Funktion zum Zeichnen von PNG-Daten auf dem Bildschirm
 void pngDraw(PNGDRAW* pDraw) {
@@ -185,11 +213,11 @@ void Second_Tick() {
     satellites[i].satAz = satellites[i].sat.satAz;  // Azimut speichern
     satellites[i].satEl = satellites[i].sat.satEl;  // Elevation speichern
 
-   // if (satellites[i].satEl >= minel) {
-   //   // Append the satellite name to the buffer
-   //   strncat(namesWithElevation, satellites[i].name, sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);
-   //   //strncat(namesWithElevation, " ", sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);  // Add comma and space
-   // }
+    if (satellites[i].satEl >= minel) {
+      // Append the satellite name to the buffer
+      strncat(namesWithElevation, satellites[i].name, sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);
+      //strncat(namesWithElevation, " ", sizeof(namesWithElevation) - strlen(namesWithElevation) - 1);  // Add comma and space
+    }
 
     Serial.println("Satellit " + String(i) + ": Azimut = " + String(satellites[i].satAz) + " Elevation = " + String(satellites[i].satEl));
   }
@@ -205,16 +233,14 @@ void Second_Tick() {
   }
 }
 // Function to display satellite names on the screen
-//void displaySatelliteNames() {
-//  // Set position for names
-//  tft.setCursor(0, 0);  // Cursor position
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Set text color
-//  tft.setTextSize(1);  // Set text size
-//  //tft.println("Satellites with Elevation >= 1°:");
-//  tft.println(namesWithElevation);  // Print names
-//}
-
-
+void displaySatelliteNames() {
+  // Set position for names
+  tft.setCursor(0, 0);  // Cursor position
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Set text color
+  tft.setTextSize(1);  // Set text size
+  //tft.println("Satellites with Elevation >= 1°:");
+  tft.println(namesWithElevation);  // Print names
+}
 // Setup-Funktion, die einmal beim Start aufgerufen wird
 void setup() {
   tft.begin();  // TFT initialisieren
@@ -227,15 +253,21 @@ void setup() {
   tft.println("By DO7OO and ChatGPT");
   tft.setTextSize(1);  // Schriftgröße setzen
   tft.println("");
+  Serial.begin(115200);  // Serielle Kommunikation starten
+  Serial.println("#######################################");
+  Serial.println();
   tft.println("Seriell ok.");
   tft.println("WiFi verbinden...");  // WiFi-Verbindung versuchen
   WiFi.begin(ssid, password);  // WiFi mit SSID und Passwort starten
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);  // Warten, bis die Verbindung hergestellt ist
+    Serial.print(".");  // Punkt anzeigen
     tft.print("*");  // Stern anzeigen
   }
   tft.println("");
   tft.println("WiFi ok.");  // Verbindung hergestellt
+  Serial.println("Mit WiFi verbunden");
+
   timeClient.begin();  // NTP-Client starten
   tft.println("Zeit-Client ok.");
   timeClient.update();  // Zeit aktualisieren
@@ -252,6 +284,7 @@ void setup() {
   tft.println("Tick ok.");
   tft.println("");
   tft.println("Bitte warten...");
+
 }
 
 // Hauptschleife
